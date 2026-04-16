@@ -2,8 +2,8 @@
 
 **Version:** 1.0.0
 **Last Updated:** 16 April 2026
-**Current Phase:** Milestone 1 (Project Foundation) - Complete
-**Overall Progress:** 10%
+**Current Phase:** Milestone 2 (Core Canvas System) - In Progress
+**Overall Progress:** 20%
 
 ---
 
@@ -43,16 +43,18 @@ _Tasks are moved here from milestones when work begins. Mark complete with [x] w
 - [x] Create basic `.instructions.md` for project-specific patterns
 - [x] Create asset directories and placeholder files
 
-### M2: Core Canvas System (0%)
+### M2: Core Canvas System (85%)
 **Goal:** Canvas rendering foundation with auto-scaling and background grid
 
-- [ ] Create `assets/public/js/canvas-controller.js` (ES6 class)
-- [ ] Implement canvas initialization and sizing
-- [ ] Create auto-scale algorithm (fit object with padding)
-- [ ] Render background grid layer (configurable size)
-- [ ] Handle canvas resize/responsiveness
-- [ ] Scale grid with object dimensions
-- [ ] Add checkered pattern to background (optional)
+- [x] Create `assets/public/js/canvas-controller.js` (ES6 class)
+- [x] Implement canvas initialization and sizing
+- [x] Create auto-scale algorithm (fit object with padding)
+- [x] Render background grid layer (configurable size)
+- [x] Handle canvas resize/responsiveness
+- [x] Scale grid with object dimensions
+- [x] Add checkered pattern to background (optional)
+- [ ] Test on mobile devices
+- [ ] Optimize grid rendering performance
 
 ### M3: Paper Sheet Calculations (0%)
 **Goal:** Mathematical engine for paper size relationships

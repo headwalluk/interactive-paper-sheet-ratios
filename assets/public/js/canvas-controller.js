@@ -39,24 +39,77 @@
 				showInches: false
 			};
 
-			// Debounce timer.
-			this.renderTimer = null;
+		// Canvas dimensions (will be set on resize).
+		this.canvasWidth = 0;
+		this.canvasHeight = 0;
 
-			this.init();
-		}
+		// Scaling factor (pixels per mm).
+		this.scale = 1;
 
-		/**
-		 * Initialize controller.
-		 */
-		init() {
-			this.bindEvents();
-			this.render();
-		}
+		// Debounce timer.
+		this.renderTimer = null;
+		this.resizeTimer = null;
 
-		/**
-		 * Bind event listeners.
-		 */
-		bindEvents() {
+		this.init();
+	}
+
+	/**
+	 * Initialize controller.
+	 */
+	init() {
+		this.setupCanvas();
+		this.bindEvents();
+		this.render();
+	}
+
+	/**
+	 * Setup canvas dimensions and properties.
+	 */
+	setupCanvas() {
+		// Set canvas size to match container.
+		this.resizeCanvas();
+
+		// Handle window resize.
+		window.addEventListener('resize', () => {
+			clearTimeout(this.resizeTimer);
+			this.resizeTimer = setTimeout(() => {
+				this.resizeCanvas();
+				this.render();
+			}, 250);
+		});
+	}
+
+	/**
+	 * Resize canvas to match container dimensions.
+	 */
+	resizeCanvas() {
+		const container = this.canvas.parentElement;
+		const containerWidth = container.clientWidth;
+		
+		// Use 16:9 aspect ratio for canvas, or square for mobile.
+		const isMobile = window.innerWidth < 768;
+		const aspectRatio = isMobile ? 1 : 16 / 9;
+		
+		this.canvasWidth = containerWidth;
+		this.canvasHeight = containerWidth / aspectRatio;
+
+		// Set canvas resolution (use device pixel ratio for crisp rendering).
+		const dpr = window.devicePixelRatio || 1;
+		this.canvas.width = this.canvasWidth * dpr;
+		this.canvas.height = this.canvasHeight * dpr;
+
+		// Set display size.
+		this.canvas.style.width = this.canvasWidth + 'px';
+		this.canvas.style.height = this.canvasHeight + 'px';
+
+		// Scale context to match device pixel ratio.
+		this.ctx.scale(dpr, dpr);
+	}
+
+	/**
+	 * Bind event listeners.
+	 */
+	bindEvents() {
 			// Width input.
 			const widthInput = document.getElementById('ipsr-width');
 			const widthSlider = document.getElementById('ipsr-width-slider');
@@ -205,13 +258,127 @@
 		 * Main render method.
 		 */
 		render() {
-			// TODO: Implement full canvas rendering in subsequent milestones.
-			// For now, just update outputs.
-			this.updateOutputs();
+		// Clear canvas.
+		this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+		// Calculate dimensions for all levels.
+		const dimensions = this.calculateDimensions();
+
+		// Calculate scale to fit largest sheet with padding.
+		this.calculateScale(dimensions);
+
+		// Render layers (bottom to top).
+		this.renderBackground();
+		this.renderGrid();
+		
+		// Update text outputs.
+		this.updateOutputs();
+	}
+
+	/**
+	 * Calculate dimensions for all paper size levels.
+	 *
+	 * @return {Array} Array of {width, height} objects for each level.
+	 */
+	calculateDimensions() {
+		const levels = this.config.levels;
+		const dimensions = [];
+		
+		// Level 0 is the datum (smallest) sheet.
+		let currentWidth = this.state.width;
+		let currentHeight = this.state.height;
+		
+		dimensions.push({ width: currentWidth, height: currentHeight });
+
+		// Each level doubles the area.
+		// To maintain aspect ratio, we alternate which dimension gets multiplied by √2.
+		for (let i = 1; i < levels; i++) {
+			if (i % 2 === 1) {
+				// Odd levels: increase width.
+				currentWidth = currentWidth * this.config.sqrt_two;
+			} else {
+				// Even levels: increase height.
+				currentHeight = currentHeight * this.config.sqrt_two;
+			}
+			dimensions.push({ 
+				width: Math.round(currentWidth * 100) / 100, 
+				height: Math.round(currentHeight * 100) / 100 
+			});
 		}
 
-		/**
-		 * Update output displays.
+		return dimensions;
+	}
+
+	/**
+	 * Calculate scale factor to fit object in canvas with padding.
+	 *
+	 * @param {Array} dimensions - Array of dimension objects.
+	 */
+	calculateScale(dimensions) {
+		// Get largest (outer) sheet dimensions.
+		const outerSheet = dimensions[dimensions.length - 1];
+		const outerWidth = outerSheet.width;
+		const outerHeight = outerSheet.height;
+
+		// Add padding (convert to mm).
+		const padding = this.config.padding * 2; // Left + right, top + bottom.
+		const totalWidth = outerWidth + padding;
+		const totalHeight = outerHeight + padding;
+
+		// Calculate scale to fit in canvas.
+		const scaleX = this.canvasWidth / totalWidth;
+		const scaleY = this.canvasHeight / totalHeight;
+
+		// Use smaller scale to ensure it fits.
+		this.scale = Math.min(scaleX, scaleY);
+	}
+
+	/**
+	 * Render background fill.
+	 */
+	renderBackground() {
+		// Solid grey background.
+		this.ctx.fillStyle = '#e0e0e0';
+		this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+	}
+
+	/**
+	 * Render background grid with checkered pattern.
+	 */
+	renderGrid() {
+		const gridSize = this.config.grid_size * this.scale;
+		
+		// Draw checkered pattern.
+		this.ctx.fillStyle = '#d0d0d0';
+		
+		for (let x = 0; x < this.canvasWidth; x += gridSize) {
+			for (let y = 0; y < this.canvasHeight; y += gridSize) {
+				// Alternate pattern.
+				if ((Math.floor(x / gridSize) + Math.floor(y / gridSize)) % 2 === 0) {
+					this.ctx.fillRect(x, y, gridSize, gridSize);
+				}
+			}
+		}
+
+		// Draw grid lines.
+		this.ctx.strokeStyle = '#c0c0c0';
+		this.ctx.lineWidth = 0.5;
+
+		// Vertical lines.
+		for (let x = 0; x < this.canvasWidth; x += gridSize) {
+			this.ctx.beginPath();
+			this.ctx.moveTo(x, 0);
+			this.ctx.lineTo(x, this.canvasHeight);
+			this.ctx.stroke();
+		}
+
+		// Horizontal lines.
+		for (let y = 0; y < this.canvasHeight; y += gridSize) {
+			this.ctx.beginPath();
+			this.ctx.moveTo(0, y);
+			this.ctx.lineTo(this.canvasWidth, y);
+			this.ctx.stroke();
+		}
 		 */
 		updateOutputs() {
 			// Calculate total area (outer sheet after all doublings).

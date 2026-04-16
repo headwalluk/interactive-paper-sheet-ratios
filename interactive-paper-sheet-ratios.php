@@ -3,7 +3,7 @@
  * Plugin Name: Interactive Paper Sheet Ratios
  * Plugin URI: https://powerplugins.com
  * Description: Interactive canvas visualization showing relationships between paper sizes (A4→A0) with real-time dimension adjustment and aspect ratio calculations.
- * Version: 1.0.0
+ * Version: 0.1.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Power Plugins
@@ -19,7 +19,7 @@
 defined( 'ABSPATH' ) || die();
 
 // Plugin version.
-const IPSR_VERSION = '1.0.0';
+const IPSR_VERSION = '0.1.0';
 
 // Plugin root file.
 const IPSR_PLUGIN_FILE = __FILE__;

@@ -1,6 +1,6 @@
 # Project Tracker
 
-**Version:** 1.0.0
+**Version:** 0.1.0
 **Last Updated:** 16 April 2026
 **Current Phase:** Milestone 5 (Interactive Rendering) - Complete
 **Overall Progress:** 60%

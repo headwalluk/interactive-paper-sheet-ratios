@@ -1,89 +1,24 @@
+![License: GPLv2](https://img.shields.io/badge/License-GPLv2-blue.svg)
+![WordPress: 6.0+](https://img.shields.io/badge/WordPress-6.0%2B-21759b.svg)
+![PHP: 8.0+](https://img.shields.io/badge/PHP-8.0%2B-777bb4.svg)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-green.svg)
+
 # Interactive Paper Sheet Ratios
 
-Interactive canvas visualization showing relationships between paper sizes (A4→A0) with real-time dimension adjustment.
+A WordPress plugin that renders an interactive canvas visualisation of nested paper sizes via the `[paper_sheet_ratios]` shortcode. Users adjust datum sheet dimensions and see nested sizes (A0 through A4 by default) reconfigure in real-time, with a colour overlay showing deviation from the ideal A0 area.
 
-## Features
-
-- Canvas-based visualization with auto-scaling
-- Real-time user inputs (width/height via numeric + slider controls)
-- Portrait/landscape orientation toggle
-- Color overlay feedback (green/red based on deviation from ideal A0 area)
-- Configurable aspect ratio precision
-- Unit toggle (mm² ⟷ in²)
-- Fully responsive and mobile-friendly
-
-## Installation
-
-1. Upload plugin folder to `/wp-content/plugins/`
-2. Activate through the WordPress 'Plugins' menu
-
-## Usage
-
-Add the shortcode to any post or page:
+## Quick Start
 
 ```
 [paper_sheet_ratios]
 ```
 
-### Shortcode Parameters
+## Documentation
 
-All parameters are optional:
-
-```
-[paper_sheet_ratios 
-    decimals="8"              Default: 8
-    levels="5"                Default: 5 (A4→A0)
-    opacity_cap="50"          Default: 50 (percent)
-    grid_size="100"           Default: 100 (mm)
-    padding="20"              Default: 20 (mm)
-    default_width="297"       Default: 297 (A4 width, mm)
-    default_height="210"      Default: 210 (A4 height, mm)
-    default_orientation="portrait"  Default: portrait
-]
-```
-
-## Requirements
-
-- WordPress 6.0+
-- PHP 8.0+
-- Modern browser with canvas support
-
-## Development
-
-### File Structure
-
-```
-interactive-paper-sheet-ratios/
-├── interactive-paper-sheet-ratios.php  # Main plugin file
-├── constants.php                        # All constants
-├── includes/
-│   └── class-plugin.php                # Core plugin class
-├── assets/
-│   └── public/
-│       ├── css/public.css              # Styles
-│       └── js/canvas-controller.js     # Canvas logic
-└── dev-notes/                          # Documentation
-```
-
-### Coding Standards
-
-Follow WordPress Coding Standards:
-
-```bash
-phpcs              # Check standards
-phpcbf             # Auto-fix issues
-```
-
-### Documentation
-
-- **Project Tracker:** `dev-notes/00-project-tracker.md`
-- **Project Instructions:** `.instructions.md`
-- **Coding Standards:** `.github/copilot-instructions.md`
+- [Usage Guide](docs/usage.md) -- installation, controls, and canvas features
+- [Configuration](docs/configuration.md) -- shortcode attributes and examples
+- [Developer Guide](docs/developer.md) -- architecture, coding standards, and extending the plugin
 
 ## License
 
-GPL v2 or later
-
-## Author
-
-Power Plugins - https://powerplugins.com
+[GPLv2 or later](LICENSE)

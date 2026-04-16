@@ -32,14 +32,14 @@ const SHORTCODE_TAG = 'paper_sheet_ratios';
  *
  * @since 1.0.0
  */
-const DEF_DATUM_WIDTH = 297;
+const DEF_DATUM_WIDTH = 210;
 
 /**
  * Default datum sheet height in millimeters (A4 portrait).
  *
  * @since 1.0.0
  */
-const DEF_DATUM_HEIGHT = 210;
+const DEF_DATUM_HEIGHT = 297;
 
 /**
  * Default number of size levels (A4 through A0 = 5 levels).
@@ -77,11 +77,25 @@ const DEF_GRID_SIZE = 100;
 const DEF_CANVAS_PADDING = 20;
 
 /**
- * Default orientation: 'portrait' or 'landscape'.
+ * Minimum allowed datum dimension in millimeters.
  *
  * @since 1.0.0
  */
-const DEF_ORIENTATION = 'portrait';
+const DEF_DATUM_MIN = 150;
+
+/**
+ * Maximum allowed datum dimension in millimeters.
+ *
+ * @since 1.0.0
+ */
+const DEF_DATUM_MAX = 400;
+
+/**
+ * Step increment for datum dimension inputs.
+ *
+ * @since 1.0.0
+ */
+const DEF_DATUM_STEP = 0.01;
 
 // ------------------------------------------------------------------------
 // Calculation Constants

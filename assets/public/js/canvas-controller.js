@@ -35,91 +35,90 @@
 			this.state = {
 				width: config.default_width,
 				height: config.default_height,
-				isLandscape: config.default_orientation === 'landscape',
 				showInches: false
 			};
 
-		// Canvas dimensions (will be set on resize).
-		this.canvasWidth = 0;
-		this.canvasHeight = 0;
+			// Canvas dimensions (will be set on resize).
+			this.canvasWidth = 0;
+			this.canvasHeight = 0;
 
-		// Scaling factor (pixels per mm).
-		this.scale = 1;
+			// Scaling factor (pixels per mm).
+			this.scale = 1;
 
-		// Debounce timer.
-		this.renderTimer = null;
-		this.resizeTimer = null;
+			// Debounce timer.
+			this.renderTimer = null;
+			this.resizeTimer = null;
 
-		this.init();
-	}
+			this.init();
+		}
 
-	/**
-	 * Initialize controller.
-	 */
-	init() {
-		this.setupCanvas();
-		this.bindEvents();
-		this.render();
-	}
+		/**
+		 * Initialize controller.
+		 */
+		init() {
+			this.setupCanvas();
+			this.bindEvents();
+			this.render();
+		}
 
-	/**
-	 * Setup canvas dimensions and properties.
-	 */
-	setupCanvas() {
-		// Set canvas size to match container.
-		this.resizeCanvas();
+		/**
+		 * Setup canvas dimensions and properties.
+		 */
+		setupCanvas() {
+			// Set canvas size to match container.
+			this.resizeCanvas();
 
-		// Handle window resize.
-		window.addEventListener('resize', () => {
-			clearTimeout(this.resizeTimer);
-			this.resizeTimer = setTimeout(() => {
-				this.resizeCanvas();
-				this.render();
-			}, 250);
-		});
-	}
+			// Handle window resize.
+			window.addEventListener('resize', () => {
+				clearTimeout(this.resizeTimer);
+				this.resizeTimer = setTimeout(() => {
+					this.resizeCanvas();
+					this.render();
+				}, 250);
+			});
+		}
 
-	/**
-	 * Resize canvas to match container dimensions.
-	 */
-	resizeCanvas() {
-		const container = this.canvas.parentElement;
-		const containerWidth = container.clientWidth;
-		
-		// Use 16:9 aspect ratio for canvas, or square for mobile.
-		const isMobile = window.innerWidth < 768;
-		const aspectRatio = isMobile ? 1 : 16 / 9;
-		
-		this.canvasWidth = containerWidth;
-		this.canvasHeight = containerWidth / aspectRatio;
+		/**
+		 * Resize canvas to match container dimensions.
+		 */
+		resizeCanvas() {
+			const container = this.canvas.parentElement;
+			const containerWidth = container.clientWidth;
 
-		// Set canvas resolution (use device pixel ratio for crisp rendering).
-		const dpr = window.devicePixelRatio || 1;
-		this.canvas.width = this.canvasWidth * dpr;
-		this.canvas.height = this.canvasHeight * dpr;
+			// Use 16:9 aspect ratio for canvas, or square for mobile.
+			const isMobile = window.innerWidth < 768;
+			const aspectRatio = isMobile ? 1 : 16 / 9;
 
-		// Set display size.
-		this.canvas.style.width = this.canvasWidth + 'px';
-		this.canvas.style.height = this.canvasHeight + 'px';
+			this.canvasWidth = containerWidth;
+			this.canvasHeight = containerWidth / aspectRatio;
 
-		// Scale context to match device pixel ratio.
-		this.ctx.scale(dpr, dpr);
-	}
+			// Set canvas resolution (use device pixel ratio for crisp rendering).
+			const dpr = window.devicePixelRatio || 1;
+			this.canvas.width = this.canvasWidth * dpr;
+			this.canvas.height = this.canvasHeight * dpr;
 
-	/**
-	 * Bind event listeners.
-	 */
-	bindEvents() {
+			// Set display size.
+			this.canvas.style.width = this.canvasWidth + 'px';
+			this.canvas.style.height = this.canvasHeight + 'px';
+
+			// Scale context to match device pixel ratio.
+			this.ctx.scale(dpr, dpr);
+		}
+
+		/**
+		 * Bind event listeners.
+		 */
+		bindEvents() {
 			// Width input.
 			const widthInput = document.getElementById('ipsr-width');
 			const widthSlider = document.getElementById('ipsr-width-slider');
 
 			if (widthInput) {
-				widthInput.addEventListener('input', (e) => this.handleWidthChange(e.target.value));
+				widthInput.addEventListener('input', (e) => this.handleWidthChange(e.target.value, e.target));
 			}
 
 			if (widthSlider) {
-				widthSlider.addEventListener('input', (e) => this.handleWidthChange(e.target.value));
+				widthSlider.addEventListener('input', (e) => this.handleWidthChange(e.target.value, e.target));
 			}
 
 			// Height input.
@@ -127,17 +126,17 @@
 			const heightSlider = document.getElementById('ipsr-height-slider');
 
 			if (heightInput) {
-				heightInput.addEventListener('input', (e) => this.handleHeightChange(e.target.value));
+				heightInput.addEventListener('input', (e) => this.handleHeightChange(e.target.value, e.target));
 			}
 
 			if (heightSlider) {
-				heightSlider.addEventListener('input', (e) => this.handleHeightChange(e.target.value));
+				heightSlider.addEventListener('input', (e) => this.handleHeightChange(e.target.value, e.target));
 			}
 
-			// Orientation toggle.
-			const orientationToggle = document.getElementById('ipsr-orientation');
-			if (orientationToggle) {
-				orientationToggle.addEventListener('change', (e) => this.handleOrientationChange(e.target.checked));
+			// Swap button.
+			const swapButton = document.getElementById('ipsr-swap');
+			if (swapButton) {
+				swapButton.addEventListener('click', () => this.handleSwap());
 			}
 
 			// Unit toggle.
@@ -150,24 +149,25 @@
 		/**
 		 * Handle width change.
 		 *
-		 * @param {string} value - New width value.
+		 * @param {string}  value  - New width value.
+		 * @param {Element} source - The input element that triggered the change.
 		 */
-		handleWidthChange(value) {
-			const width = parseInt(value, 10);
+		handleWidthChange(value, source) {
+			const width = parseFloat(value);
 			if (isNaN(width) || width <= 0) {
 				return;
 			}
 
 			this.state.width = width;
 
-			// Sync inputs.
+			// Sync the other input (not the source, to avoid clobbering mid-edit text).
 			const widthInput = document.getElementById('ipsr-width');
 			const widthSlider = document.getElementById('ipsr-width-slider');
 
-			if (widthInput) {
+			if (widthInput && widthInput !== source) {
 				widthInput.value = width;
 			}
-			if (widthSlider) {
+			if (widthSlider && widthSlider !== source) {
 				widthSlider.value = width;
 			}
 
@@ -177,24 +177,25 @@
 		/**
 		 * Handle height change.
 		 *
-		 * @param {string} value - New height value.
+		 * @param {string}  value  - New height value.
+		 * @param {Element} source - The input element that triggered the change.
 		 */
-		handleHeightChange(value) {
-			const height = parseInt(value, 10);
+		handleHeightChange(value, source) {
+			const height = parseFloat(value);
 			if (isNaN(height) || height <= 0) {
 				return;
 			}
 
 			this.state.height = height;
 
-			// Sync inputs.
+			// Sync the other input (not the source, to avoid clobbering mid-edit text).
 			const heightInput = document.getElementById('ipsr-height');
 			const heightSlider = document.getElementById('ipsr-height-slider');
 
-			if (heightInput) {
+			if (heightInput && heightInput !== source) {
 				heightInput.value = height;
 			}
-			if (heightSlider) {
+			if (heightSlider && heightSlider !== source) {
 				heightSlider.value = height;
 			}
 
@@ -202,19 +203,14 @@
 		}
 
 		/**
-		 * Handle orientation change.
-		 *
-		 * @param {boolean} isLandscape - Whether landscape is selected.
+		 * Handle swap button click: transpose width and height.
 		 */
-		handleOrientationChange(isLandscape) {
-			this.state.isLandscape = isLandscape;
-
-			// Transpose dimensions.
+		handleSwap() {
 			const temp = this.state.width;
 			this.state.width = this.state.height;
 			this.state.height = temp;
 
-			// Update inputs.
+			// Sync all inputs.
 			const widthInput = document.getElementById('ipsr-width');
 			const widthSlider = document.getElementById('ipsr-width-slider');
 			const heightInput = document.getElementById('ipsr-height');
@@ -255,257 +251,356 @@
 		}
 
 		/**
+		 * Calculate the outer sheet dimensions.
+		 *
+		 * The outer sheet preserves the datum's aspect ratio, scaled up by 4×
+		 * on each side (16× area).
+		 *
+		 * @return {Object} {width, height} of the outer sheet in mm.
+		 */
+		calculateOuterSheet() {
+			return {
+				width: this.state.width * 4,
+				height: this.state.height * 4
+			};
+		}
+
+		/**
 		 * Main render method.
 		 */
 		render() {
-		// Clear canvas.
-		this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+			// Clear canvas.
+			this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-		// Calculate dimensions for all levels.
-		const dimensions = this.calculateDimensions();
+			// Calculate outer sheet from datum.
+			const outerSheet = this.calculateOuterSheet();
 
-		// Calculate scale to fit largest sheet with padding.
-		this.calculateScale(dimensions);
+			// Calculate scale to fit outer sheet with padding.
+			this.calculateScale(outerSheet);
 
-		// Render layers (bottom to top).
-		this.renderBackground();
-		this.renderGrid();
-		this.renderColorOverlay(dimensions);
-		this.renderPaperSheets(dimensions);
-		let currentHeight = this.state.height;
-		
-		dimensions.push({ width: currentWidth, height: currentHeight });
+			// Render layers (bottom to top).
+			this.renderBackground();
+			this.renderGrid();
+			this.renderColorOverlay(outerSheet);
+			this.renderPaperSheets(outerSheet);
 
-		// Each level doubles the area.
-		// To maintain aspect ratio, we alternate which dimension gets multiplied by √2.
-		for (let i = 1; i < levels; i++) {
-			if (i % 2 === 1) {
-				// Odd levels: increase width.
-				currentWidth = currentWidth * this.config.sqrt_two;
-			} else {
-				// Even levels: increase height.
-				currentHeight = currentHeight * this.config.sqrt_two;
-			}
-			dimensions.push({ 
-				width: Math.round(currentWidth * 100) / 100, 
-				height: Math.round(currentHeight * 100) / 100 
-			});
+			// Update output displays.
+			this.updateOutputs();
 		}
 
-		return dimensions;
-	}
+		/**
+		 * Calculate scale factor to fit outer sheet in canvas with padding.
+		 *
+		 * @param {Object} outerSheet - {width, height} of outer sheet in mm.
+		 */
+		calculateScale(outerSheet) {
+			// Add padding (convert to mm).
+			const padding = this.config.padding * 2; // Left + right, top + bottom.
+			const totalWidth = outerSheet.width + padding;
+			const totalHeight = outerSheet.height + padding;
 
-	/**
-	 * Calculate scale factor to fit object in canvas with padding.
-	 *
-	 * @param {Array} dimensions - Array of dimension objects.
-	 */
-	calculateScale(dimensions) {
-		// Get largest (outer) sheet dimensions.
-		const outerSheet = dimensions[dimensions.length - 1];
-		const outerWidth = outerSheet.width;
-		const outerHeight = outerSheet.height;
+			// Calculate scale to fit in canvas.
+			const scaleX = this.canvasWidth / totalWidth;
+			const scaleY = this.canvasHeight / totalHeight;
 
-		// Add padding (convert to mm).
-		const padding = this.config.padding * 2; // Left + right, top + bottom.
-		const totalWidth = outerWidth + padding;
-		const totalHeight = outerHeight + padding;
+			// Use smaller scale to ensure it fits.
+			this.scale = Math.min(scaleX, scaleY);
+		}
 
-		// Calculate scale to fit in canvas.
-		const scaleX = this.canvasWidth / totalWidth;
-		const scaleY = this.canvasHeight / totalHeight;
+		/**
+		 * Render background fill.
+		 */
+		renderBackground() {
+			// Solid grey background.
+			this.ctx.fillStyle = '#e0e0e0';
+			this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+		}
 
-		// Use smaller scale to ensure it fits.
-		this.scale = Math.min(scaleX, scaleY);
-	}
+		/**
+		 * Render background grid with checkered pattern.
+		 */
+		renderGrid() {
+			const gridSize = this.config.grid_size * this.scale;
 
-	/**
-	 * Render background fill.
-	 */
-	renderBackground() {
-		// Solid grey background.
-		this.ctx.fillStyle = '#e0e0e0';
-		this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-	}
+			// Draw checkered pattern.
+			this.ctx.fillStyle = '#d0d0d0';
 
-	/**
-	 * Render background grid with checkered pattern.
-	 */
-	renderGrid() {
-		const gridSize = this.config.grid_size * this.scale;
-		
-		// Draw checkered pattern.
-		this.ctx.fillStyle = '#d0d0d0';
-		
-		for (let x = 0; x < this.canvasWidth; x += gridSize) {
-			for (let y = 0; y < this.canvasHeight; y += gridSize) {
-				// Alternate pattern.
-				if ((Math.floor(x / gridSize) + Math.floor(y / gridSize)) % 2 === 0) {
-					this.ctx.fillRect(x, y, gridSize, gridSize);
+			for (let x = 0; x < this.canvasWidth; x += gridSize) {
+				for (let y = 0; y < this.canvasHeight; y += gridSize) {
+					// Alternate pattern.
+					if ((Math.floor(x / gridSize) + Math.floor(y / gridSize)) % 2 === 0) {
+						this.ctx.fillRect(x, y, gridSize, gridSize);
+					}
 				}
 			}
-		}
 
-		// Draw grid lines.
-		this.ctx.strokeStyle = '#c0c0c0';
-		this.ctx.lineWidth = 0.5;
+			// Draw grid lines.
+			this.ctx.strokeStyle = '#c0c0c0';
+			this.ctx.lineWidth = 0.5;
 
-		// Vertical lines.
-		for (let x = 0; x < this.canvasWidth; x += gridSize) {
-			this.ctx.beginPath();
-			this.ctx.moveTo(x, 0);
-			this.ctx.lineTo(x, this.canvasHeight);
-			this.ctx.stroke();
-		}
+			// Vertical lines.
+			for (let x = 0; x < this.canvasWidth; x += gridSize) {
+				this.ctx.beginPath();
+				this.ctx.moveTo(x, 0);
+				this.ctx.lineTo(x, this.canvasHeight);
+				this.ctx.stroke();
+			}
 
-		// Horizontal lines.
-		for (let y = 0; y < this.canvasHeight; y += gridSize) {
-			this.ctx.beginPath();
-			this.ctx.moveTo(0, y);
-			this.ctx.lineTo(this.canvasWidth, y);
-			this.ctx.stroke();
-		}
-	}
-
-	/**
-	 * Render color overlay based on deviation from ideal area.
-	 *
-	 * @param {Array} dimensions - Array of dimension objects.
-	 */
-	renderColorOverlay(dimensions) {
-		// Calculate total area (outer sheet).
-		const outerSheet = dimensions[dimensions.length - 1];
-		const totalArea = outerSheet.width * outerSheet.height;
-		
-		// Calculate deviation from ideal area.
-		const idealArea = this.config.ideal_area;
-		const deviation = Math.abs(totalArea - idealArea);
-		
-		// If exactly at ideal, no overlay.
-		if (deviation < 1) {
-			return;
-		}
-		
-		// Calculate opacity using logarithmic scale.
-		const maxDeviation = idealArea; // Maximum reasonable deviation.
-		const normalized = Math.log(deviation + 1) / Math.log(maxDeviation + 1);
-		const opacity = Math.min(this.config.opacity_cap / 100, normalized * (this.config.opacity_cap / 100));
-		
-		// Determine color (red if above, green if below).
-		const color = totalArea > idealArea ? '255, 0, 0' : '0, 255, 0';
-		
-		// Render overlay.
-		this.ctx.fillStyle = `rgba(${color}, ${opacity})`;
-		this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-	}
-
-	/**
-	 * Render nested paper sheets.
-	 *
-	 * @param {Array} dimensions - Array of dimension objects.
-	 */
-	renderPaperSheets(dimensions) {
-		// Calculate center position for outer sheet.
-		const outerSheet = dimensions[dimensions.length - 1];
-		const outerWidth = outerSheet.width * this.scale;
-		const outerHeight = outerSheet.height * this.scale;
-		
-		const startX = (this.canvasWidth - outerWidth) / 2;
-		const startY = (this.canvasHeight - outerHeight) / 2;
-		
-		// Draw from largest to smallest (back to front).
-		for (let i = dimensions.length - 1; i >= 0; i--) {
-			const dim = dimensions[i];
-			const width = dim.width * this.scale;
-			const height = dim.height * this.scale;
-			
-			// Position in top-left corner of outer sheet.
-			const x = startX;
-			const y = startY;
-			
-			// Draw filled rectangle with border.
-			this.ctx.fillStyle = i === 0 ? '#ffffff' : '#f8f8f8';
-			this.ctx.fillRect(x, y, width, height);
-			
-			// Draw border.
-			this.ctx.strokeStyle = '#333333';
-			this.ctx.lineWidth = i === 0 ? 2 : 1;
-			this.ctx.strokeRect(x, y, width, height);
-			
-			// Draw label.
-			this.renderLabel(i, x, y, width, height, dim);
-		}
-	}
-
-	/**
-	 * Render label for a paper sheet.
-	 *
-	 * @param {number} level - Level index (0 = smallest).
-	 * @param {number} x - X position.
-	 * @param {number} y - Y position.
-	 * @param {number} width - Sheet width in pixels.
-	 * @param {number} height - Sheet height in pixels.
-	 * @param {Object} dim - Dimension object {width, height} in mm.
-	 */
-	renderLabel(level, x, y, width, height, dim) {
-		// Label text (A0, A1, A2, etc. in reverse).
-		const totalLevels = this.config.levels;
-		const labelIndex = totalLevels - 1 - level;
-		const label = `A${labelIndex}`;
-		
-		// Font size based on sheet size.
-		const fontSize = Math.max(12, Math.min(32, Math.min(width, height) / 8));
-		this.ctx.font = `bold ${fontSize}px sans-serif`;
-		this.ctx.fillStyle = '#333333';
-		this.ctx.textAlign = 'left';
-		this.ctx.textBaseline = 'top';
-		
-		// Position with padding.
-		const padding = fontSize / 4;
-		this.ctx.fillText(label, x + padding, y + padding);
-		
-		// Add dimensions (smaller text).
-		const dimFontSize = fontSize * 0.6;
-		this.ctx.font = `${dimFontSize}px sans-serif`;
-		this.ctx.fillStyle = '#666666';
-		
-		const dimText = `${Math.round(dim.width)}mm × ${Math.round(dim.height)}mm`;
-		this.ctx.fillText(dimText, x + padding, y + padding + fontSize);
-	}
-
-	/**
-	 * Update output displays.
-	 */
-	updateOutputs() {
-		// Calculate total area (outer sheet after all doublings).
-		const levels = this.config.levels;
-		const datumArea = this.state.width * this.state.height;
-		const totalArea = datumArea * Math.pow(2, levels - 1);
-
-		// Calculate aspect ratio.
-		const ratio = (this.state.width / this.state.height).toFixed(this.config.decimals);
-
-		// Update area display.
-		const areaElement = document.getElementById('ipsr-output-area');
-		if (areaElement) {
-			if (this.state.showInches) {
-				const areaInches = (totalArea / this.config.sq_mm_per_sq_inch).toFixed(2);
-				areaElement.textContent = `${areaInches.toLocaleString()} in²`;
-			} else {
-				areaElement.textContent = `${totalArea.toLocaleString()} mm²`;
+			// Horizontal lines.
+			for (let y = 0; y < this.canvasHeight; y += gridSize) {
+				this.ctx.beginPath();
+				this.ctx.moveTo(0, y);
+				this.ctx.lineTo(this.canvasWidth, y);
+				this.ctx.stroke();
 			}
 		}
 
-		// Update ratio display.
-		const ratioElement = document.getElementById('ipsr-output-ratio');
-		if (ratioElement) {
-			ratioElement.textContent = ratio;
+		/**
+		 * Render color overlay based on deviation from ideal area.
+		 *
+		 * @param {Object} outerSheet - {width, height} of outer sheet in mm.
+		 */
+		renderColorOverlay(outerSheet) {
+			// Calculate total area (outer sheet).
+			const totalArea = outerSheet.width * outerSheet.height;
+
+			// Calculate deviation from ideal area.
+			const idealArea = this.config.ideal_area;
+			const deviation = Math.abs(totalArea - idealArea);
+
+			// If exactly at ideal, no overlay.
+			if (deviation < 1) {
+				return;
+			}
+
+			// Calculate opacity using logarithmic scale.
+			const maxDeviation = idealArea; // Maximum reasonable deviation.
+			const normalized = Math.log(deviation + 1) / Math.log(maxDeviation + 1);
+			const opacity = Math.min(this.config.opacity_cap / 100, normalized * (this.config.opacity_cap / 100));
+
+			// Determine color (red if above, green if below).
+			const color = totalArea > idealArea ? '255, 0, 0' : '0, 255, 0';
+
+			// Render overlay.
+			this.ctx.fillStyle = `rgba(${color}, ${opacity})`;
+			this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+		}
+
+		/**
+		 * Get fill color for a labelled subdivision region.
+		 *
+		 * Produces a graduated blue: darkest at A1, fading to lightest at
+		 * the final subdivision.
+		 *
+		 * @param {number} labelIndex - Label index (1 = A1, 2 = A2, etc.).
+		 * @return {string} CSS color string.
+		 */
+		getRegionColor(labelIndex) {
+			const subdivisions = this.config.levels - 1;
+
+			// t=0 → darkest (A1), t=1 → lightest (datum).
+			const t = (labelIndex - 1) / (subdivisions - 1);
+			const r = Math.round(42 + t * (240 - 42));
+			const g = Math.round(113 + t * (245 - 113));
+			const b = Math.round(186 + t * (250 - 186));
+
+			return `rgb(${r}, ${g}, ${b})`;
+		}
+
+		/**
+		 * Get graduated border style for a subdivision depth.
+		 *
+		 * Outer borders (depth 0) are thickest and darkest; inner borders
+		 * are thinnest and lightest.
+		 *
+		 * @param {number} depth - Subdivision depth (0 = outer/A0, increasing inward).
+		 * @return {Object} Object with lineWidth and strokeStyle properties.
+		 */
+		getBorderStyle(depth) {
+			const maxDepth = this.config.levels - 1;
+			const t = depth / maxDepth;
+
+			// Line width: 4px at outer, 0.5px at innermost.
+			const lineWidth = 4 - t * 3.5;
+
+			// Colour: dark (#1a1a1a) at outer, light (#aaaaaa) at innermost.
+			const channel = Math.round(26 + t * 144);
+			const strokeStyle = `rgb(${channel}, ${channel}, ${channel})`;
+
+			return { lineWidth, strokeStyle };
+		}
+
+		/**
+		 * Render paper sheets by iterative subdivision.
+		 *
+		 * Starts with the A0 outer rectangle and iteratively splits the
+		 * container in half along its longest edge. One half is labelled
+		 * as A{i+1}; the other (empty) half becomes the container for the
+		 * next iteration. Runs levels-1 iterations total.
+		 *
+		 * @param {Object} outerSheet - {width, height} of outer sheet in mm.
+		 */
+		renderPaperSheets(outerSheet) {
+			const outerWidthPx = outerSheet.width * this.scale;
+			const outerHeightPx = outerSheet.height * this.scale;
+			const startX = (this.canvasWidth - outerWidthPx) / 2;
+			const startY = (this.canvasHeight - outerHeightPx) / 2;
+			const subdivisions = this.config.levels - 1;
+
+			// Fill entire outer sheet with base colour (A0).
+			this.ctx.fillStyle = '#2a71ba';
+			this.ctx.fillRect(startX, startY, outerWidthPx, outerHeightPx);
+
+			// Draw outer border (A0).
+			const outerBorder = this.getBorderStyle(0);
+			this.ctx.strokeStyle = outerBorder.strokeStyle;
+			this.ctx.lineWidth = outerBorder.lineWidth;
+			this.ctx.strokeRect(startX, startY, outerWidthPx, outerHeightPx);
+
+			// Iterative subdivision: container starts as the full outer sheet.
+			let rx = startX;
+			let ry = startY;
+			let rw = outerWidthPx;
+			let rh = outerHeightPx;
+			let rwMm = outerSheet.width;
+			let rhMm = outerSheet.height;
+
+			for (let i = 0; i < subdivisions; i++) {
+				const label = i + 1;
+				const border = this.getBorderStyle(label);
+
+				if (rw >= rh) {
+					// Vertical split along width.
+					const halfW = rw / 2;
+					const halfWMm = rwMm / 2;
+
+					// Fill labelled piece (left half).
+					this.ctx.fillStyle = this.getRegionColor(label);
+					this.ctx.fillRect(rx, ry, halfW, rh);
+
+					// Draw dividing line.
+					this.ctx.strokeStyle = border.strokeStyle;
+					this.ctx.lineWidth = border.lineWidth;
+					this.ctx.beginPath();
+					this.ctx.moveTo(rx + halfW, ry);
+					this.ctx.lineTo(rx + halfW, ry + rh);
+					this.ctx.stroke();
+
+					// Label the piece.
+					this.renderLabel(label, rx, ry, halfW, rh, halfWMm, rhMm);
+
+					// Empty half (right) becomes next container.
+					rx = rx + halfW;
+					rw = halfW;
+					rwMm = halfWMm;
+				} else {
+					// Horizontal split along height.
+					const halfH = rh / 2;
+					const halfHMm = rhMm / 2;
+
+					// Fill labelled piece (top half).
+					this.ctx.fillStyle = this.getRegionColor(label);
+					this.ctx.fillRect(rx, ry, rw, halfH);
+
+					// Draw dividing line.
+					this.ctx.strokeStyle = border.strokeStyle;
+					this.ctx.lineWidth = border.lineWidth;
+					this.ctx.beginPath();
+					this.ctx.moveTo(rx, ry + halfH);
+					this.ctx.lineTo(rx + rw, ry + halfH);
+					this.ctx.stroke();
+
+					// Label the piece.
+					this.renderLabel(label, rx, ry, rw, halfH, rwMm, halfHMm);
+
+					// Empty half (bottom) becomes next container.
+					ry = ry + halfH;
+					rh = halfH;
+					rhMm = halfHMm;
+				}
+			}
+
+			// Label A0 at the center of the full outer rectangle.
+			this.renderLabel(0, startX, startY, outerWidthPx, outerHeightPx, outerSheet.width, outerSheet.height);
+		}
+
+		/**
+		 * Render label for a paper sheet region.
+		 *
+		 * Labels are centered within the region with dimensions shown below.
+		 *
+		 * @param {number} labelIndex - Label index (0 = A0, 1 = A1, etc.).
+		 * @param {number} x - X position in pixels.
+		 * @param {number} y - Y position in pixels.
+		 * @param {number} width - Region width in pixels.
+		 * @param {number} height - Region height in pixels.
+		 * @param {number} widthMm - Region width in mm.
+		 * @param {number} heightMm - Region height in mm.
+		 */
+		renderLabel(labelIndex, x, y, width, height, widthMm, heightMm) {
+			const label = `A${labelIndex}`;
+			const centerX = x + width / 2;
+			const centerY = y + height / 2;
+
+			// Font size based on region size.
+			const fontSize = Math.max(10, Math.min(48, Math.min(width, height) / 4));
+			this.ctx.font = `bold ${fontSize}px sans-serif`;
+			this.ctx.fillStyle = '#1a1a1a';
+			this.ctx.textAlign = 'center';
+			this.ctx.textBaseline = 'bottom';
+
+			// Label slightly above center.
+			this.ctx.fillText(label, centerX, centerY);
+
+			// Dimensions text below label.
+			const dimFontSize = Math.max(8, fontSize * 0.4);
+			this.ctx.font = `${dimFontSize}px sans-serif`;
+			this.ctx.fillStyle = '#444444';
+			this.ctx.textBaseline = 'top';
+
+			const dimText = `${Math.round(widthMm)}mm × ${Math.round(heightMm)}mm`;
+			this.ctx.fillText(dimText, centerX, centerY + 2);
+		}
+
+		/**
+		 * Update output displays.
+		 */
+		updateOutputs() {
+			// Calculate total area (outer sheet after all doublings).
+			const levels = this.config.levels;
+			const datumArea = this.state.width * this.state.height;
+			const totalArea = datumArea * Math.pow(2, levels - 1);
+
+			// Calculate aspect ratio.
+			const ratio = (this.state.width / this.state.height).toFixed(this.config.decimals);
+
+			// Update area display.
+			const areaElement = document.getElementById('ipsr-output-area');
+			if (areaElement) {
+				if (this.state.showInches) {
+					const areaInches = (totalArea / this.config.sq_mm_per_sq_inch).toFixed(2);
+					areaElement.textContent = `${areaInches.toLocaleString()} in²`;
+				} else {
+					areaElement.textContent = `${totalArea.toLocaleString()} mm²`;
+				}
+			}
+
+			// Update ratio display.
+			const ratioElement = document.getElementById('ipsr-output-ratio');
+			if (ratioElement) {
+				ratioElement.textContent = ratio;
+			}
+
+			// Update inverted ratio display.
+			const ratioInvElement = document.getElementById('ipsr-output-ratio-inv');
+			if (ratioInvElement) {
+				const inverted = (this.state.height / this.state.width).toFixed(this.config.decimals);
+				ratioInvElement.textContent = inverted;
+			}
 		}
 	}
 
-}
-
-// Initialize when DOM is ready.
+	// Initialize when DOM is ready.
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', () => {
 			if (typeof ipsrConfig !== 'undefined') {

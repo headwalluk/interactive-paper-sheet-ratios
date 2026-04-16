@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<ruleset name="Interactive Paper Sheet Ratios Standards">
+	<description>WordPress Coding Standards for Interactive Paper Sheet Ratios plugin</description>
+	
+	<file>.</file>
+	
+	<!-- Exclude patterns -->
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/assets/*</exclude-pattern>
+	<exclude-pattern>*/.git/*</exclude-pattern>
+	<exclude-pattern>*/dev-notes/*</exclude-pattern>
+	
+	<!-- Arguments -->
+	<arg value="sp"/>
+	<arg name="basepath" value="."/>
+	<arg name="colors"/>
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/>
+	
+	<!-- Rules -->
+	<rule ref="WordPress">
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+	</rule>
+	
+	<!-- Prefixes -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="interactive_paper_sheet_ratios"/>
+				<element value="ipsr"/>
+				<element value="Interactive_Paper_Sheet_Ratios"/>
+			</property>
+		</properties>
+	</rule>
+	
+	<!-- Text domain -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="interactive-paper-sheet-ratios"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

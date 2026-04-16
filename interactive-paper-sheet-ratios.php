@@ -35,8 +35,12 @@ require_once __DIR__ . '/constants.php';
 require_once __DIR__ . '/functions-private.php';
 
 // Load classes.
+require_once __DIR__ . '/includes/class-headwall-github-plugin-updater.php';
 require_once __DIR__ . '/includes/class-shortcode-paper-sheet-ratios.php';
 require_once __DIR__ . '/includes/class-plugin.php';
+
+// GitHub auto-updater.
+new Headwall_GitHub_Plugin_Updater( __FILE__, 'headwalluk/interactive-paper-sheet-ratios' );
 
 /**
  * Initialize and run the plugin.

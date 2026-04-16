@@ -475,34 +475,37 @@
 
 	/**
 	 * Update output displays.
-			// Calculate total area (outer sheet after all doublings).
-			const levels = this.config.levels;
-			const datumArea = this.state.width * this.state.height;
-			const totalArea = datumArea * Math.pow(2, levels - 1);
+	 */
+	updateOutputs() {
+		// Calculate total area (outer sheet after all doublings).
+		const levels = this.config.levels;
+		const datumArea = this.state.width * this.state.height;
+		const totalArea = datumArea * Math.pow(2, levels - 1);
 
-			// Calculate aspect ratio.
-			const ratio = (this.state.width / this.state.height).toFixed(this.config.decimals);
+		// Calculate aspect ratio.
+		const ratio = (this.state.width / this.state.height).toFixed(this.config.decimals);
 
-			// Update area display.
-			const areaElement = document.getElementById('ipsr-output-area');
-			if (areaElement) {
-				if (this.state.showInches) {
-					const areaInches = (totalArea / this.config.sq_mm_per_sq_inch).toFixed(2);
-					areaElement.textContent = `${areaInches.toLocaleString()} in²`;
-				} else {
-					areaElement.textContent = `${totalArea.toLocaleString()} mm²`;
-				}
+		// Update area display.
+		const areaElement = document.getElementById('ipsr-output-area');
+		if (areaElement) {
+			if (this.state.showInches) {
+				const areaInches = (totalArea / this.config.sq_mm_per_sq_inch).toFixed(2);
+				areaElement.textContent = `${areaInches.toLocaleString()} in²`;
+			} else {
+				areaElement.textContent = `${totalArea.toLocaleString()} mm²`;
 			}
+		}
 
-			// Update ratio display.
-			const ratioElement = document.getElementById('ipsr-output-ratio');
-			if (ratioElement) {
-				ratioElement.textContent = ratio;
-			}
+		// Update ratio display.
+		const ratioElement = document.getElementById('ipsr-output-ratio');
+		if (ratioElement) {
+			ratioElement.textContent = ratio;
 		}
 	}
 
-	// Initialize when DOM is ready.
+}
+
+// Initialize when DOM is ready.
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', () => {
 			if (typeof ipsrConfig !== 'undefined') {

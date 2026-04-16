@@ -29,6 +29,15 @@ class Plugin {
 	private bool $shortcode_present = false;
 
 	/**
+	 * Configuration array for JavaScript.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @var array<string, mixed>
+	 */
+	private array $config = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0.0
@@ -119,8 +128,8 @@ class Plugin {
 			$config['default_orientation'] = DEF_ORIENTATION;
 		}
 
-		// Store config for JavaScript.
-		wp_localize_script( ASSET_JS_PUBLIC, 'ipsrConfig', $config );
+		// Store config for enqueue_assets().
+		$this->config = $config;
 
 		// Build output.
 		$output = '';
@@ -276,5 +285,8 @@ class Plugin {
 			IPSR_VERSION,
 			true
 		);
+
+		// Localize config data for JavaScript.
+		wp_localize_script( ASSET_JS_PUBLIC, 'ipsrConfig', $this->config );
 	}
 }

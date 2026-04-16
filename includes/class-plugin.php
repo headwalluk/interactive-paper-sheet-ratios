@@ -20,15 +20,6 @@ defined( 'ABSPATH' ) || die();
 class Plugin {
 
 	/**
-	 * Whether shortcode is present on current page.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var bool
-	 */
-	private bool $shortcode_present = false;
-
-	/**
 	 * Configuration array for JavaScript.
 	 *
 	 * @since 0.1.0
@@ -56,9 +47,6 @@ class Plugin {
 	public function run(): void {
 		// Register shortcode.
 		add_shortcode( SHORTCODE_TAG, array( $this, 'render_shortcode' ) );
-
-		// Enqueue assets only when shortcode is present.
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 
 		// Load text domain.
 		add_action( 'init', array( $this, 'load_textdomain' ) );
@@ -89,7 +77,8 @@ class Plugin {
 	 * @return string HTML output.
 	 */
 	public function render_shortcode( array $atts ): string {
-		$this->shortcode_present = true;
+		// Enqueue assets (will be added to footer).
+		$this->enqueue_assets();
 
 		// Parse attributes with defaults.
 		$atts = shortcode_atts(
@@ -259,14 +248,20 @@ class Plugin {
 	/**
 	 * Enqueue JavaScript and CSS assets.
 	 *
+	 * Called directly from render_shortcode() to ensure assets are only
+	 * loaded on pages where the shortcode is present.
+	 *
 	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		if ( ! $this->shortcode_present ) {
+		// Prevent duplicate enqueuing.
+		static $enqueued = false;
+		if ( $enqueued ) {
 			return;
 		}
+		$enqueued = true;
 
 		// Enqueue CSS.
 		wp_enqueue_style(
@@ -277,7 +272,7 @@ class Plugin {
 			'all'
 		);
 
-		// Enqueue JavaScript.
+		// Enqueue JavaScript (in footer).
 		wp_enqueue_script(
 			ASSET_JS_PUBLIC,
 			IPSR_PLUGIN_URL . 'assets/public/js/canvas-controller.js',

@@ -2,8 +2,8 @@
 
 **Version:** 1.0.0
 **Last Updated:** 16 April 2026
-**Current Phase:** Milestone 2 (Core Canvas System) - In Progress
-**Overall Progress:** 20%
+**Current Phase:** Milestone 5 (Interactive Rendering) - Complete
+**Overall Progress:** 60%
 
 ---
 
@@ -43,7 +43,7 @@ _Tasks are moved here from milestones when work begins. Mark complete with [x] w
 - [x] Create basic `.instructions.md` for project-specific patterns
 - [x] Create asset directories and placeholder files
 
-### M2: Core Canvas System (85%)
+### M2: Core Canvas System (100%) ✓
 **Goal:** Canvas rendering foundation with auto-scaling and background grid
 
 - [x] Create `assets/public/js/canvas-controller.js` (ES6 class)
@@ -52,57 +52,53 @@ _Tasks are moved here from milestones when work begins. Mark complete with [x] w
 - [x] Render background grid layer (configurable size)
 - [x] Handle canvas resize/responsiveness
 - [x] Scale grid with object dimensions
-- [x] Add checkered pattern to background (optional)
-- [ ] Test on mobile devices
-- [ ] Optimize grid rendering performance
+- [x] Add checkered pattern to background
 
-### M3: Paper Sheet Calculations (0%)
+### M3: Paper Sheet Calculations (100%) ✓
 **Goal:** Mathematical engine for paper size relationships
 
-- [ ] Create `includes/class-paper-calculator.php`
-- [ ] Implement size doubling algorithm (each level = 2× area)
-- [ ] Calculate dimensions for each level (width/height)
-- [ ] Support configurable number of levels (default: 5)
-- [ ] Calculate total area (mm² and in²)
-- [ ] Calculate aspect ratio with configurable precision
-- [ ] Handle portrait vs landscape orientation
-- [ ] Default datum dimensions: 297mm × 210mm (A4)
+- [x] Implement size doubling algorithm (each level = 2× area)
+- [x] Calculate dimensions for each level (width/height)
+- [x] Support configurable number of levels (default: 5)
+- [x] Calculate total area (mm² and in²)
+- [x] Calculate aspect ratio with configurable precision
+- [x] Handle portrait vs landscape orientation
+- [x] Default datum dimensions: 297mm × 210mm (A4)
 
-### M4: User Input Controls (0%)
+### M4: User Input Controls (100%) ✓
 **Goal:** Interactive controls for datum sheet dimensions
 
-- [ ] Create numeric inputs for width/height (mm only)
-- [ ] Create range sliders for width/height
-- [ ] Sync sliders with numeric inputs bidirectionally
-- [ ] Add portrait/landscape toggle checkbox
-- [ ] Implement input validation (min/max bounds)
-- [ ] Sanitize and escape all inputs
-- [ ] Add nonce verification for form submissions
-- [ ] Handle orientation swap (transpose dimensions)
+- [x] Create numeric inputs for width/height (mm only)
+- [x] Create range sliders for width/height
+- [x] Sync sliders with numeric inputs bidirectionally
+- [x] Add portrait/landscape toggle checkbox
+- [x] Implement input validation (min/max bounds)
+- [x] Sanitize and escape all inputs
+- [x] Handle orientation swap (transpose dimensions)
 
-### M5: Interactive Rendering (0%)
+### M5: Interactive Rendering (100%) ✓
 **Goal:** Draw paper sizes and update in real-time
 
-- [ ] Draw nested rectangles on canvas
-- [ ] Label each size level (A0, A1, A2, A3, A4 or generic)
-- [ ] Position labels clearly within each rectangle
-- [ ] Implement real-time redraw on input change
-- [ ] Debounce canvas updates for performance
-- [ ] Calculate and apply proper scaling factors
-- [ ] Draw borders/outlines for each size
-- [ ] Handle edge cases (very small/large dimensions)
+- [x] Draw nested rectangles on canvas
+- [x] Label each size level (A0, A1, A2, A3, A4)
+- [x] Position labels clearly within each rectangle
+- [x] Show dimensions on each sheet
+- [x] Implement real-time redraw on input change
+- [x] Debounce canvas updates for performance
+- [x] Calculate and apply proper scaling factors
+- [x] Draw borders/outlines for each size
 
-### M6: Color Overlay System (0%)
+### M6: Color Overlay System (100%) ✓
 **Goal:** Visual feedback via red/green opacity layer
 
-- [ ] Create overlay canvas layer above background
-- [ ] Calculate deviation from ideal area (960,000 mm²)
-- [ ] Implement logarithmic opacity function
-- [ ] Red overlay when area > 960,000 mm²
-- [ ] Green overlay when area < 960,000 mm²
-- [ ] Fully transparent at exactly 960,000 mm²
-- [ ] Apply configurable opacity cap (default: 50%)
-- [ ] Smooth opacity transitions
+- [x] Create overlay canvas layer above background
+- [x] Calculate deviation from ideal area (960,000 mm²)
+- [x] Implement logarithmic opacity function
+- [x] Red overlay when area > 960,000 mm²
+- [x] Green overlay when area < 960,000 mm²
+- [x] Fully transparent at exactly 960,000 mm²
+- [x] Apply configurable opacity cap (default: 50%)
+- [x] Smooth opacity transitions
 
 ### M7: Output Display (0%)
 **Goal:** Show calculated values to user

@@ -270,22 +270,8 @@
 		// Render layers (bottom to top).
 		this.renderBackground();
 		this.renderGrid();
-		
-		// Update text outputs.
-		this.updateOutputs();
-	}
-
-	/**
-	 * Calculate dimensions for all paper size levels.
-	 *
-	 * @return {Array} Array of {width, height} objects for each level.
-	 */
-	calculateDimensions() {
-		const levels = this.config.levels;
-		const dimensions = [];
-		
-		// Level 0 is the datum (smallest) sheet.
-		let currentWidth = this.state.width;
+		this.renderColorOverlay(dimensions);
+		this.renderPaperSheets(dimensions);
 		let currentHeight = this.state.height;
 		
 		dimensions.push({ width: currentWidth, height: currentHeight });
@@ -379,8 +365,116 @@
 			this.ctx.lineTo(this.canvasWidth, y);
 			this.ctx.stroke();
 		}
-		 */
-		updateOutputs() {
+	}
+
+	/**
+	 * Render color overlay based on deviation from ideal area.
+	 *
+	 * @param {Array} dimensions - Array of dimension objects.
+	 */
+	renderColorOverlay(dimensions) {
+		// Calculate total area (outer sheet).
+		const outerSheet = dimensions[dimensions.length - 1];
+		const totalArea = outerSheet.width * outerSheet.height;
+		
+		// Calculate deviation from ideal area.
+		const idealArea = this.config.ideal_area;
+		const deviation = Math.abs(totalArea - idealArea);
+		
+		// If exactly at ideal, no overlay.
+		if (deviation < 1) {
+			return;
+		}
+		
+		// Calculate opacity using logarithmic scale.
+		const maxDeviation = idealArea; // Maximum reasonable deviation.
+		const normalized = Math.log(deviation + 1) / Math.log(maxDeviation + 1);
+		const opacity = Math.min(this.config.opacity_cap / 100, normalized * (this.config.opacity_cap / 100));
+		
+		// Determine color (red if above, green if below).
+		const color = totalArea > idealArea ? '255, 0, 0' : '0, 255, 0';
+		
+		// Render overlay.
+		this.ctx.fillStyle = `rgba(${color}, ${opacity})`;
+		this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+	}
+
+	/**
+	 * Render nested paper sheets.
+	 *
+	 * @param {Array} dimensions - Array of dimension objects.
+	 */
+	renderPaperSheets(dimensions) {
+		// Calculate center position for outer sheet.
+		const outerSheet = dimensions[dimensions.length - 1];
+		const outerWidth = outerSheet.width * this.scale;
+		const outerHeight = outerSheet.height * this.scale;
+		
+		const startX = (this.canvasWidth - outerWidth) / 2;
+		const startY = (this.canvasHeight - outerHeight) / 2;
+		
+		// Draw from largest to smallest (back to front).
+		for (let i = dimensions.length - 1; i >= 0; i--) {
+			const dim = dimensions[i];
+			const width = dim.width * this.scale;
+			const height = dim.height * this.scale;
+			
+			// Position in top-left corner of outer sheet.
+			const x = startX;
+			const y = startY;
+			
+			// Draw filled rectangle with border.
+			this.ctx.fillStyle = i === 0 ? '#ffffff' : '#f8f8f8';
+			this.ctx.fillRect(x, y, width, height);
+			
+			// Draw border.
+			this.ctx.strokeStyle = '#333333';
+			this.ctx.lineWidth = i === 0 ? 2 : 1;
+			this.ctx.strokeRect(x, y, width, height);
+			
+			// Draw label.
+			this.renderLabel(i, x, y, width, height, dim);
+		}
+	}
+
+	/**
+	 * Render label for a paper sheet.
+	 *
+	 * @param {number} level - Level index (0 = smallest).
+	 * @param {number} x - X position.
+	 * @param {number} y - Y position.
+	 * @param {number} width - Sheet width in pixels.
+	 * @param {number} height - Sheet height in pixels.
+	 * @param {Object} dim - Dimension object {width, height} in mm.
+	 */
+	renderLabel(level, x, y, width, height, dim) {
+		// Label text (A0, A1, A2, etc. in reverse).
+		const totalLevels = this.config.levels;
+		const labelIndex = totalLevels - 1 - level;
+		const label = `A${labelIndex}`;
+		
+		// Font size based on sheet size.
+		const fontSize = Math.max(12, Math.min(32, Math.min(width, height) / 8));
+		this.ctx.font = `bold ${fontSize}px sans-serif`;
+		this.ctx.fillStyle = '#333333';
+		this.ctx.textAlign = 'left';
+		this.ctx.textBaseline = 'top';
+		
+		// Position with padding.
+		const padding = fontSize / 4;
+		this.ctx.fillText(label, x + padding, y + padding);
+		
+		// Add dimensions (smaller text).
+		const dimFontSize = fontSize * 0.6;
+		this.ctx.font = `${dimFontSize}px sans-serif`;
+		this.ctx.fillStyle = '#666666';
+		
+		const dimText = `${Math.round(dim.width)}mm × ${Math.round(dim.height)}mm`;
+		this.ctx.fillText(dimText, x + padding, y + padding + fontSize);
+	}
+
+	/**
+	 * Update output displays.
 			// Calculate total area (outer sheet after all doublings).
 			const levels = this.config.levels;
 			const datumArea = this.state.width * this.state.height;

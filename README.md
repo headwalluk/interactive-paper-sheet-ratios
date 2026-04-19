@@ -1,7 +1,7 @@
 ![License: GPLv2](https://img.shields.io/badge/License-GPLv2-blue.svg)
 ![WordPress: 6.0+](https://img.shields.io/badge/WordPress-6.0%2B-21759b.svg)
 ![PHP: 8.0+](https://img.shields.io/badge/PHP-8.0%2B-777bb4.svg)
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-green.svg)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-green.svg)
 
 # Interactive Paper Sheet Ratios
 

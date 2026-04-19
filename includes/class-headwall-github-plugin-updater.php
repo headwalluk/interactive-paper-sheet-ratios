@@ -12,7 +12,7 @@
  *   new Headwall_GitHub_Plugin_Updater( __FILE__, 'owner/repo-name' );
  *
  * @package Headwall
- * @version 1.1.1
+ * @version 1.1.2
  * @license GPLv2+
  * @author  Paul Faulkner — Headwall Hosting (https://headwall-hosting.com/)
  */
@@ -26,7 +26,7 @@ if ( defined( 'HW_GITHUB_UPDATER_VERSION' ) ) {
 	return;
 }
 
-define( 'HW_GITHUB_UPDATER_VERSION', '1.1.1' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Shared constant across plugins.
+define( 'HW_GITHUB_UPDATER_VERSION', '1.1.2' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Shared constant across plugins.
 
 /**
  * Checks GitHub Releases for plugin updates and hooks into the

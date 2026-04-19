@@ -5,6 +5,17 @@ All notable changes to the Interactive Paper Sheet Ratios plugin will be documen
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-04-19
+
+### Added
+- `normaliseParameters()` in the canvas controller clamps width/height to the input's min/max at render time, preventing huge mid-typed values from locking up the browser
+
+### Changed
+- Colour overlay opacity now uses a linear scale instead of logarithmic for a more gradual transition near the ideal area
+- Ideal A0 area threshold raised from 960,000 mm² to 1,000,000 mm² (1 m²); previous value retained as a commented reference in `constants.php`
+- Lower input debounce interval for smoother live rendering
+- Background grid is now centred within the canvas
+
 ## [1.0.0] - 2026-04-16
 
 ### Added

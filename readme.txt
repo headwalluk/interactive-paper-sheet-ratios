@@ -4,7 +4,7 @@ Tags: paper sizes, visualization, canvas, aspect ratio, A-series
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,9 +64,16 @@ Yes, use the `default_width` and `default_height` attributes to set the datum sh
 
 = What does the color overlay mean? =
 
-The overlay indicates deviation from the ideal A0 paper area (960,000 mm2). Green means the total area is below ideal, red means above. The overlay is fully transparent when the area exactly matches.
+The overlay indicates deviation from the ideal A0 paper area (1,000,000 mm2 = 1 m2). Green means the total area is below ideal, red means above. The overlay is fully transparent when the area exactly matches.
 
 == Changelog ==
+
+= 1.0.1 =
+* Clamp width/height against input min/max at render time to prevent huge mid-typed values from locking up the canvas
+* Change colour overlay opacity from logarithmic to linear scale for a more gradual transition
+* Raise ideal A0 area threshold from 960,000 mm2 to 1,000,000 mm2 (1 m2)
+* Lower input debounce interval for smoother live rendering
+* Centre the background grid within the canvas
 
 = 1.0.0 =
 * Initial public release

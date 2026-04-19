@@ -3,7 +3,7 @@
  * Plugin Name: Interactive Paper Sheet Ratios
  * Plugin URI: https://cubit-calculator.one/
  * Description: Interactive canvas visualization showing relationships between paper sizes (A4→A0) with real-time dimension adjustment and aspect ratio calculations.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Paul Faulkner
@@ -19,7 +19,7 @@
 defined( 'ABSPATH' ) || die();
 
 // Plugin version.
-const IPSR_VERSION = '1.0.0';
+const IPSR_VERSION = '1.0.1';
 
 // Plugin root file.
 const IPSR_PLUGIN_FILE = __FILE__;
@@ -33,13 +33,11 @@ define( 'IPSR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 // Load constants.
 require_once __DIR__ . '/constants.php';
 require_once __DIR__ . '/functions-private.php';
-
-// Load classes.
-require_once __DIR__ . '/includes/class-headwall-github-plugin-updater.php';
 require_once __DIR__ . '/includes/class-shortcode-paper-sheet-ratios.php';
 require_once __DIR__ . '/includes/class-plugin.php';
 
 // GitHub auto-updater.
+require_once __DIR__ . '/includes/class-headwall-github-plugin-updater.php';
 new Headwall_GitHub_Plugin_Updater( __FILE__, 'headwalluk/interactive-paper-sheet-ratios' );
 
 /**

@@ -103,11 +103,12 @@ const DEF_DATUM_STEP = 0.01;
 
 /**
  * Ideal A0 paper area in square millimeters.
- * Used as threshold for color overlay (960,000 mm² ≈ 1200mm × 800mm).
+ * Used as threshold for color overlay (1,000,000 mm² = 1 m²).
  *
  * @since 1.0.0
  */
-const IDEAL_AREA_THRESHOLD = 960000;
+// const IDEAL_AREA_THRESHOLD = 960000; // Previous value (≈ 1200mm × 800mm).
+const IDEAL_AREA_THRESHOLD = 1000000;
 
 /**
  * Square root of 2 for A-series paper ratio calculations.
